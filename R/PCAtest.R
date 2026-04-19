@@ -121,7 +121,7 @@ PCAtest <- function(
 
   # empirical eigenvalues, loadings, Psi, and Phi
 
-  pcaemp <- stats::prcomp(na.omit(x), scale = T, center = T)
+  pcaemp <- stats::prcomp(x, scale = T, center = T)
   eigenvalues <- pcaemp$sdev^2
 
   if (dim(x)[1] < dim(x)[2]) {
@@ -187,7 +187,7 @@ PCAtest <- function(
     }
 
     bootdata <- x[sample(nrow(x), size = dim(x)[1], replace = TRUE), ]
-    pcaboot <- stats::prcomp(na.omit(bootdata), scale = scale, center = center)
+    pcaboot <- stats::prcomp(bootdata, scale = scale, center = center)
     eigenvalues <- pcaboot$sdev^2
 
     if (dim(x)[1] < dim(x)[2]) {
@@ -288,7 +288,7 @@ PCAtest <- function(
 
     repvalue <- 0
     perm <- apply(x, MARGIN = 2, FUN = sample)
-    pcaperm <- stats::prcomp(na.omit(perm), scale = scale, center = center)
+    pcaperm <- stats::prcomp(perm, scale = scale, center = center)
     eigenvalues <- pcaperm$sdev^2 # eigenvalues
 
     if (dim(x)[1] < dim(x)[2]) {
