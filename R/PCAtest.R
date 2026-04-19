@@ -114,7 +114,9 @@ PCAtest <- function(
   indload = TRUE,
   varcorr = FALSE,
   counter = TRUE,
-  plot = TRUE
+  plot = TRUE,
+  scale = TRUE,
+  center = TRUE
 ) {
   # check dependencies
 
@@ -147,7 +149,7 @@ PCAtest <- function(
 
   # empirical correlations
 
-  if (varcorr == T) {
+  if (isTRUE(varcorr)) {
     corobs <- c()
     for (i in 1:length(eigenvalues)) {
       corobs <- rbind(corobs, pcaemp$rotation[, i] * sqrt(eigenvalues[i]))
@@ -185,13 +187,13 @@ PCAtest <- function(
   cat("\nSampling bootstrap replicates... Please wait\n")
 
   for (i in 1:nboot) {
-    if (counter == T) {
+    if (isTRUE(counter)) {
       cat("\r", i, "of", nboot, "bootstrap replicates\r")
       utils::flush.console()
     }
 
     bootdata <- x[sample(nrow(x), size = dim(x)[1], replace = TRUE), ]
-    pcaboot <- stats::prcomp(na.omit(bootdata), scale = T, center = T)
+    pcaboot <- stats::prcomp(na.omit(bootdata), scale = scale, center = center)
     eigenvalues <- pcaboot$sdev^2
 
     if (dim(x)[1] < dim(x)[2]) {
@@ -292,7 +294,7 @@ PCAtest <- function(
 
     repvalue <- 0
     perm <- apply(x, MARGIN = 2, FUN = sample)
-    pcaperm <- stats::prcomp(na.omit(perm), scale = T, center = T)
+    pcaperm <- stats::prcomp(na.omit(perm), scale = scale, center = center)
     eigenvalues <- pcaperm$sdev^2 # eigenvalues
 
     if (dim(x)[1] < dim(x)[2]) {
