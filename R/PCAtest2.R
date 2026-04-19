@@ -19,6 +19,7 @@ PCAtest2 <- function(
 
   if (nrow(x) < ncol(x)) {
     eigenvalues <- eigenvalues[-length(eigenvalues)]
+    pcaemp$rotation <- pcaemp$rotation[, -ncol(pcaemp$rotation)]
   }
 
   eigenobs <- eigenvalues
@@ -30,9 +31,9 @@ PCAtest2 <- function(
 
   # empirical correlations
 
-  if (isTRUE(varcorr)) {
+  #if (isTRUE(varcorr)) {
     corobs <- t(pcaemp$rotation %*% diag(sqrt(eigenvalues)))
-  }
+  #}
 
   # empirical Psi
   Psiobs <- Psi <- sum((eigenvalues - 1)^2)
@@ -63,6 +64,7 @@ PCAtest2 <- function(
 
     if (nrow(x) < ncol(x)) {
       eigenvalues <- eigenvalues[-length(eigenvalues)]
+      pcaboot$rotation <- pcaboot$rotation[, -ncol(pcaboot$rotation)]
     }
 
     pervarboot[i, ] <- eigenvalues / sum(eigenvalues) * 100
@@ -648,7 +650,7 @@ PCAtest2 <- function(
       ]] <- confintind
     }
 
-    if (varcorr == T) {
+    if (isTRUE(varcorr)) {
       results[["Correlations of empirical PCs with variables"]] <- corobs
       results[["Correlations in bootstrapped data"]] <- corboot
       results[[
