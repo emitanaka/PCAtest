@@ -59,6 +59,8 @@ PCAtest2 <- function(
     }
 
     bootdata <- x[sample(nrow(x), size = nrow(x), replace = TRUE), ]
+    discard <- apply(bootdata, MARGIN = 2, function(x) sd(x) == 0)
+    bootdata <- bootdata[, !discard]
     pcaboot <- stats::prcomp(bootdata, scale = scale, center = center)
     eigenvalues <- pcaboot$sdev^2
 
