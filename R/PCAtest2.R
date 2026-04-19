@@ -1,110 +1,3 @@
-#' PCAtest: Statistical Significance of PCA
-#'
-#'   PCAtest uses random permutations to build null distributions for
-#'   several statistics of a PCA analysis: Psi (Vieira 2012), Phi (Gleason and
-#'   Staelin 1975), the rank-of-roots (ter Braak 1988), the index of the
-#'   loadings (Vieira 2012), and the correlations of the PC with the variables
-#'   (Jackson 1991). Comparing these distributions with the observed values of
-#'   the statistics, the function tests: (1) the hypothesis that there is more
-#'   correlational structure among the observed variables than expected by
-#'   random chance, (2) the statistical significance of each PC, and (3) the
-#'   contribution of each observed variable to each significant PC. The
-#'   function also calculates the sampling variance around mean observed
-#'   statistics based on bootstrap replicates.
-#'
-#' @param x A matrix or dataframe with variables in the columns and the observations in the rows.
-#' @param nperm Number of random permutations to build null distributions of the statistics.
-#' @param nboot Number of bootstrap replicates to build 95%-confidence intervals of the observed statistics.
-#' @param alpha Nominal alpha level for statistical tests.
-#' @param indload A logical indicating whether to calculate the index loadings of the variables with the significant PCs.
-#' @param varcorr A logical indicating whether to calculate the correlations of the variables with the significant PCs.
-#' @param counter A logical specifying whether to show the progress of the random sampling (bootstrap and permutations) on the screen.
-#' @param plot A logical specifying whether to plot the null distributions, observed statistics, and 95%-confidence intervals of statistics based on random permutation and bootstrap resampling.
-#'
-#' @details
-#' PCAtest uses the function stats::prcomp to run a PCA using
-#'  the arguments scale = TRUE and center = TRUE.
-#' PCAtest plots four types of graphs in a single page: (1) a histogram showing the null distribution and the observed value of the Psi statistic, (2) a histogram showing the null distribution and the observed value of the Phi statistic, (3) a bar plot of the percentage of explained variance of each PC1, PC2, ..., etc., showing the sampling variance based on bootstrap replicates and random permutations with 95%-confidence intervals, and (4) a bar plot of the index of the loadings of each observed variable for PC1, showing the sampling variance of bootstrap replicates and random permutations with 95%- confidence intervals. If more than one PC is significant, additional plots for the index of the loadings are shown in as many new pages as necessary given the number of significant PCs. If the PCA is not significant, based on the Psi and Phi testing results, only histograms (1) and (2) are shown.
-#'
-#' @return
-#' An object of class “list” with the following elements:
-#' \describe{
-#'   \item{psiobs}{The observed Psi statistic.}
-#'
-#'   \item{phiobs}{The observed Phi statistic.}
-#'
-#'   \item{psi}{The null distribution of Psi values.}
-#'
-#'   \item{phi}{The null distribution of Phi values.}
-#'
-#'   \item{pervarobs}{The percentage of variance explained by each PC based on the observed data.}
-#'
-#'   \item{pervarboot}{The percentage of variance explained by each PC based on the bootstrapped data.}
-#'
-#'   \item{pervarbootci}{Confidence intervals of the percentage of variance explained by each PC based on the bootstrapped data.}
-#'
-#'   \item{pervarperm}{The percentage of variance explained by each PC based on the randomized data.}
-#'
-#'   \item{pervarpermci}{Confidence intervals of the percentage of variance explained by each PC based on the randomized data.}
-#'
-#'   \item{indexloadobs}{The index of the loadings of the observed data.}
-#'
-#'   \item{indexloadboot}{The index of the loadings of the bootstrapped data.}
-#'
-#'   \item{indexloadbootci}{Confidence intervals of the index of the loadings based on the bootstrapped data.}
-#'
-#'   \item{indexloadperm}{The index of the loadings based on the randomized data.}
-#'
-#'   \item{indexloadpermci}{Confidence intervals of the index of the loadings based on the randomized data.}
-#'
-#'   \item{corobs}{If varcorr=TRUE, the correlations of the observed variables with each significant PC.}
-#'
-#'   \item{corboot}{If varcorr=TRUE, the correlations of the observed variables with each significant PC based on the bootstrapped data.}
-#'
-#'   \item{corbootci}{If varcorr=TRUE, the confidence intervals of the correlations of the variables with each significant PC based on the bootstrapped data.}
-#'
-#'   \item{corperm}{If varcorr=TRUE, the correlations of the observed variables with each significant PC based on randomized data.}
-#'
-#'   \item{corpermci}{If varcorr=TRUE, the confidence intervals of the correlations of the variables with each significant PC based on randomized data.}
-#'
-#'}
-#'
-#' @author
-#' Arley Camargo
-#'
-#' @references
-#' \itemize{
-#'   \item Gleason, T. C. and Staelin R. (1975) A proposal for handling missing data. Psychometrika, 40, 229–252.
-#'   \item Jackson, J. E. (1991) A User’s Guide to Principal Components. John Wiley & Sons, New York, USA.
-#'   \item Ringnér, M. (2008) What is principal component analysis? Nature Biotechnology, 26, 303–304.
-#'   \item ter Braak, C. F. J. (1990) Update notes: CANOCO (version 3.1). Agricultural Mattematic Group, Report LWA-88-02, Wagningen, Netherlands.
-#'   \item Vieira, V. M. N. C. S. (2012) Permutation tests to estimate significances on Principal Components Analysis. Computational Ecology and Software, 2, 103–123.
-#'   \item Wong, M. K. L. and Carmona, C. P. (2021) Including intraspecific trait variability to avoid distortion of functional diversity and ecological inference: Lessons from natural assemblages. Methods in Ecology and Evolution. \url{https://doi.org/10.1111/2041- 210X.13568}.
-#'}
-#' @export
-#'
-#' @examples
-#'#PCA analysis of five uncorrelated (r=0) variables
-#'library(MASS)
-#'mu <- rep(0,5)
-#'Sigma <- matrix(c(rep(c(1,0,0,0,0,0),4),1),5)
-#'ex0 <- mvrnorm(100, mu = mu, Sigma = Sigma )
-#'result<-PCAtest(ex0, 100, 100, 0.05, varcorr=FALSE, counter=FALSE, plot=TRUE)
-#'
-#'#PCA analysis of five correlated (r=0.25) variables
-#'Sigma <- matrix(c(rep(c(1,0.25,0.25,0.25,0.25,0.25),4),1),5)
-#'ex025 <- mvrnorm(100, mu = mu, Sigma = Sigma )
-#'result<-PCAtest(ex025, 100, 100, 0.05, varcorr=FALSE, counter=FALSE, plot=TRUE)
-#'
-#'#PCA analysis of five correlated (r=0.5) variables
-#'Sigma <- matrix(c(rep(c(1,0.5,0.5,0.5,0.5,0.5),4),1),5)
-#'ex05 <- mvrnorm(100, mu = mu, Sigma = Sigma )
-#'result<-PCAtest(ex05, 100, 100, 0.05, varcorr=FALSE, counter=FALSE, plot=TRUE)
-#'
-#'#PCA analysis of seven morphological variables from 29 ant species (from
-#'#Wong and Carmona 2021, https://doi.org/10.1111/2041-210X.13568)
-#'data("ants")
-#'result<-PCAtest(ants, 100, 100, 0.05, varcorr=FALSE, counter=FALSE, plot=TRUE)
 
 PCAtest2 <- function(
   x,
@@ -180,7 +73,7 @@ PCAtest2 <- function(
     }
 
     if (isTRUE(varcorr)) {
-      corload <- t(pcaemp$rotation %*% diag(sqrt(eigenvalues)))
+      corload <- t(pcaboot$rotation %*% diag(sqrt(eigenvalues)))
       corboot[i, , ] <- corload
     }
   }
@@ -238,19 +131,19 @@ PCAtest2 <- function(
     }
 
     pervarperm[i, ] <- eigenvalues / sum(eigenvalues) * 100
-    repvalue <- sum((eigenvalues - 1)^2)
-    Psi[i] <- repvalue
-    Phi[i] <- sqrt((repvalue - ncol(x)) / (ncol(x) * (ncol(x) - 1)))
+    
+    Psi[i] <- sum((eigenvalues - 1)^2)
+    Phi[i] <- sqrt((sum(eigenvalues^2) - ncol(x)) / (ncol(x) * (ncol(x) - 1)))
 
     eigenrand[i, ] <- eigenvalues
 
     if (isTRUE(indload)) {
-      indexload <- t(pcaboot$rotation^2 %*% diag(eigenvalues^2))
+      indexload <- t(pcaperm$rotation^2 %*% diag(eigenvalues^2))
       indexloadperm[i, , ] <- indexload
     }
 
     if (isTRUE(varcorr)) {
-      corload <- t(pcaemp$rotation %*% diag(sqrt(eigenvalues)))
+      corload <- t(pcaperm$rotation %*% diag(sqrt(eigenvalues)))
       corperm[i, , ] <- corload
     }
   }
@@ -271,7 +164,7 @@ PCAtest2 <- function(
     meanind <- as.vector(apply(indexloadperm, c(3, 2), mean))
   }
 
-  if (varcorr==T) {
+  if (isTRUE(varcorr)) {
     confintcor <- cbind(as.vector(apply(corperm, c(3, 2), function(x) stats::quantile(x, probs = alpha / 2))),
                         as.vector(apply(corperm, c(3, 2), function(x) stats::quantile(x, probs = 1 - alpha / 2))))
     meancor <- as.vector(apply(corperm, c(3, 2), mean))
