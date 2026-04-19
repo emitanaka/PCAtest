@@ -118,12 +118,6 @@ PCAtest <- function(
   scale = TRUE,
   center = TRUE
 ) {
-  # check dependencies
-
-  requireNamespace("stats", quietly = TRUE)
-  requireNamespace("grDevices", quietly = TRUE)
-  requireNamespace("graphics", quietly = TRUE)
-  requireNamespace("utils", quietly = TRUE)
 
   # empirical eigenvalues, loadings, Psi, and Phi
 
