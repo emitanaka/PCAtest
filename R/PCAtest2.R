@@ -128,13 +128,13 @@ PCAtest2 <- function(
       utils::flush.console()
     }
 
-    repvalue <- 0
     perm <- apply(x, MARGIN = 2, FUN = sample)
     pcaperm <- stats::prcomp(perm, scale = scale, center = center)
     eigenvalues <- pcaperm$sdev^2 # eigenvalues
 
     if (nrow(x) < ncol(x)) {
       eigenvalues <- eigenvalues[-length(eigenvalues)]
+      pcaperm$rotation <- pcaperm$rotation[, -ncol(pcaperm$rotation)]
     }
 
     pervarperm[i, ] <- eigenvalues / sum(eigenvalues) * 100
